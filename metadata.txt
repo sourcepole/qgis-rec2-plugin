@@ -5,7 +5,7 @@ qgisMaximumVersion=2.99
 description=NZ REC2
 about=NZ REC2
 version=1.0
-author=Sandro Mani / Sourcepole AG
+author=Sandro Mani (Sourcepole AG)
 email=smani@sourcepole.ch
 
 # end of mandatory metadata
