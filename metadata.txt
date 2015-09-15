@@ -4,7 +4,7 @@ qgisMinimumVersion=2.8
 qgisMaximumVersion=2.99
 description=NZ REC2
 about=NZ REC2
-version=0.1
+version=1.0
 author=Sandro Mani / Sourcepole AG
 email=smani@sourcepole.ch
 
@@ -14,15 +14,18 @@ email=smani@sourcepole.ch
 
 # Uncomment the following line and add your changelog entries:
 changelog=
+ * v1.0 (15 September 2015)
+ - Release 1.0
+
  * v0.1 (15 June 2015)
  - Initial test release
 
 # tags are comma separated with spaces allowed
 tags=
 
-homepage=http://www.sourcepole.ch
-tracker=
-repository=
+homepage=https://github.com/sourcepole/qgis-rec2-plugin
+tracker=https://github.com/sourcepole/qgis-rec2-plugin/issues
+repository=https://github.com/sourcepole/qgis-rec2-plugin
 icon=icons/icon.png
 # experimental flag
 experimental=False
