@@ -49,7 +49,6 @@ class REC2Plugin(QObject):
         except:
             pass
         try:
-            self.nearbyObservationsDialog.deleteLater()
             self.toolbar.deleteLater()
         except:
             pass
