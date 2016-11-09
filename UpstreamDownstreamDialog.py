@@ -37,11 +37,17 @@ class PointSelectTool(QgsMapTool):
 
 
 class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
-    def __init__(self, iface, recLayer, parent=None):
+    def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
         self.iface = iface
-        self.recLayer = recLayer
+        self.recLayer = None
+
+        reg = QgsMapLayerRegistry.instance()
+        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
+                self.recLayer = reg.mapLayer(layer.id())
+
         self.selectTool = PointSelectTool(self.iface)
         self.selectTool.pointSelected.connect(
             lambda p: self.lineEditPosition.setText("%f %f" % (p.x(), p.y())))
@@ -61,7 +67,24 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
         self.pushButtonSearchUpstream.clicked.connect(
             lambda: self.__addLayer(UPSTREAM_URL, "Upstream"))
 
+        self.toolButtonSelectPosition.setEnabled(False)
+        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
+                self.toolButtonSelectPosition.setEnabled(True)
+        QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.__checkLayerRemoved)
+
+    def __checkLayerRemoved(self, layerid):
+        layer = QgsMapLayerRegistry.instance().mapLayer(layerid)
+        if layer == self.recLayer:
+            self.recLayer = None
+            self.toolButtonSelectPosition.setEnabled(False)
+            self.lineEditPosition.setText("")
+
     def __addLayer(self, url, title):
+
+        if self.recLayer is None:
+            return
+
         r = self.lineEditPosition.validator().regExp()
         p = QgsPoint(float(r.cap(1)), float(r.cap(2)))
         p = self.iface.mapCanvas().mapSettings().mapToLayerCoordinates(self.recLayer, p)

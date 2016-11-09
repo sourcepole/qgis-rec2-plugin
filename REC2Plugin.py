@@ -32,12 +32,9 @@ class REC2Plugin(QObject):
         self.actionUpstreamDownstream = QAction(QIcon(':/plugins/rec2/icons/icon.png'), "NIWA Rec2", self)
         self.actionUpstreamDownstream.triggered.connect(self.__showUpstreamDownstreamDialog)
 
-        self.iface.newProjectCreated.connect(self.__onProjectCreated)
         self.toolbar.addAction(self.actionUpstreamDownstream)
         self.iface.addPluginToWebMenu("Rec2",  self.actionUpstreamDownstream)
-
-        # When reloading plugin, attempt to use currently loaded project
-        self.__onProjectRead()
+        setupDialog = SetupDialog(self.iface.mainWindow())
 
     def unload(self):
         try:
@@ -54,14 +51,11 @@ class REC2Plugin(QObject):
             pass
 
 
-    def __onProjectRead(self):
-        reg = QgsMapLayerRegistry.instance()
-        self.recLayer = reg.mapLayer(QgsProject.instance().readEntry("fishdb", "recLayer", "")[0])
 
     def __showUpstreamDownstreamDialog(self):
         try:
             self.upstreamDownstreamDialog.deleteLater()
         except:
             pass
-        self.upstreamDownstreamDialog = UpstreamDownstreamDialog(self.iface, self.recLayer, self.iface.mainWindow())
+        self.upstreamDownstreamDialog = UpstreamDownstreamDialog(self.iface, self.iface.mainWindow())
         self.upstreamDownstreamDialog.show()
