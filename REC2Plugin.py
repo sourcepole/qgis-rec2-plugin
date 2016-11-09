@@ -53,38 +53,6 @@ class REC2Plugin(QObject):
         except:
             pass
 
-    def __showSetupDialog(self):
-        setupDialog = SetupDialog(self.iface.mainWindow())
-        if setupDialog.exec_() != QDialog.Accepted:
-            return
-
-        self.iface.newProject(True)
-        # If new project was not created
-        if QgsProject.instance().isDirty():
-            return
-
-        self.iface.mainWindow().setCursor(Qt.BusyCursor)
-
-        self.recLayer = QgsRasterLayer("url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL(), setupDialog.getRecLayerTitle(), "wms")
-
-        if not self.recLayer.isValid():
-            self.iface.mainWindow().unsetCursor()
-            QMessageBox.warning(self.iface.mainWindow(), "Invalid layer", "The REC network layer is invalid. Cannot continue.")
-            return
-
-        QgsMapLayerRegistry.instance().addMapLayers([self.recLayer])
-
-        # TODO: There is a race condition, this is called before QGIS
-        # internally sets the extent to the extent of all loaded layers, and
-        # hence does not work...
-        # if self.basLayer.isValid():
-        #     self.iface.mapCanvas().setExtent(self.basLayer.extent())
-        #     self.iface.mapCanvas().refresh()
-
-
-        self.iface.mainWindow().unsetCursor()
-        QgsProject.instance().writeEntry("fishdb", "recLayer", self.recLayer.id())
-
 
     def __onProjectRead(self):
         reg = QgsMapLayerRegistry.instance()
