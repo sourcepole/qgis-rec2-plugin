@@ -17,6 +17,7 @@ import os
 import json
 from UpstreamDownstreamDialog import UpstreamDownstreamDialog
 from SetupDialog import SetupDialog
+import resources
 
 
 class REC2Plugin(QObject):
@@ -24,30 +25,16 @@ class REC2Plugin(QObject):
         QObject.__init__(self)
         self.iface = iface
         self.pluginDir = os.path.dirname(__file__)
+        self.toolbar = self.iface.addToolBar(u'Rec2')
+        self.toolbar.setObjectName(u'Rec2')
 
     def initGui(self):
-        self.actionSetup = QAction("Setup", self)
-        self.actionSep1 = QAction("", self)
-        self.actionUpstreamDownstream = QAction("Upstream/Downstream search", self)
-
-        self.actionSep1.setSeparator(True)
-        self.actionSetup.triggered.connect(self.__showSetupDialog)
         self.actionUpstreamDownstream = QAction(QIcon(':/plugins/rec2/icons/icon.png'), "NIWA Rec2", self)
         self.actionUpstreamDownstream.triggered.connect(self.__showUpstreamDownstreamDialog)
-        self.actionAbout.triggered.connect(self.__showAboutDialog)
 
-        self.menu = QMenu("REC2")
-        self.menu.addAction(self.actionSetup)
-        self.menu.addAction(self.actionSep1)
-        self.menu.addAction(self.actionUpstreamDownstream)
-        self.iface.mainWindow().menuBar().addMenu(self.menu)
-
-        self.actionGroup = QActionGroup(self)
-        self.actionGroup.addAction(self.actionUpstreamDownstream)
-        self.actionGroup.setEnabled(False)
-
-        self.iface.projectRead.connect(self.__onProjectRead)
         self.iface.newProjectCreated.connect(self.__onProjectCreated)
+        self.toolbar.addAction(self.actionUpstreamDownstream)
+        self.iface.addPluginToWebMenu("Rec2",  self.actionUpstreamDownstream)
 
         # When reloading plugin, attempt to use currently loaded project
         self.__onProjectRead()
@@ -63,6 +50,7 @@ class REC2Plugin(QObject):
             pass
         try:
             self.nearbyObservationsDialog.deleteLater()
+            self.toolbar.deleteLater()
         except:
             pass
 
@@ -94,18 +82,14 @@ class REC2Plugin(QObject):
         #     self.iface.mapCanvas().setExtent(self.basLayer.extent())
         #     self.iface.mapCanvas().refresh()
 
-        self.actionGroup.setEnabled(True)
 
         self.iface.mainWindow().unsetCursor()
         QgsProject.instance().writeEntry("fishdb", "recLayer", self.recLayer.id())
 
-    def __onProjectCreated(self):
-        self.actionGroup.setEnabled(False)
 
     def __onProjectRead(self):
         reg = QgsMapLayerRegistry.instance()
         self.recLayer = reg.mapLayer(QgsProject.instance().readEntry("fishdb", "recLayer", "")[0])
-        self.actionGroup.setEnabled((self.recLayer != None and self.recLayer.isValid()))
 
     def __showUpstreamDownstreamDialog(self):
         try:
