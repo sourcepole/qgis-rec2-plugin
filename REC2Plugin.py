@@ -17,8 +17,8 @@ import os
 import json
 
 from AboutDialog.AboutDialog import AboutDialog
-from SetupDialog.SetupDialog import SetupDialog
-from UpstreamDownstreamDialog.UpstreamDownstreamDialog import UpstreamDownstreamDialog
+from UpstreamDownstreamDialog import UpstreamDownstreamDialog
+from SetupDialog import SetupDialog
 
 
 class REC2Plugin(QObject):
