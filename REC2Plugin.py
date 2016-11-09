@@ -15,8 +15,6 @@ from qgis.core import *
 from qgis.gui import *
 import os
 import json
-
-from AboutDialog.AboutDialog import AboutDialog
 from UpstreamDownstreamDialog import UpstreamDownstreamDialog
 from SetupDialog import SetupDialog
 
@@ -31,13 +29,10 @@ class REC2Plugin(QObject):
         self.actionSetup = QAction("Setup", self)
         self.actionSep1 = QAction("", self)
         self.actionUpstreamDownstream = QAction("Upstream/Downstream search", self)
-        self.actionSep2 = QAction("", self)
-        self.actionAbout = QAction("About", self)
 
         self.actionSep1.setSeparator(True)
-        self.actionSep2.setSeparator(True)
-
         self.actionSetup.triggered.connect(self.__showSetupDialog)
+        self.actionUpstreamDownstream = QAction(QIcon(':/plugins/rec2/icons/icon.png'), "NIWA Rec2", self)
         self.actionUpstreamDownstream.triggered.connect(self.__showUpstreamDownstreamDialog)
         self.actionAbout.triggered.connect(self.__showAboutDialog)
 
@@ -45,8 +40,6 @@ class REC2Plugin(QObject):
         self.menu.addAction(self.actionSetup)
         self.menu.addAction(self.actionSep1)
         self.menu.addAction(self.actionUpstreamDownstream)
-        self.menu.addAction(self.actionSep2)
-        self.menu.addAction(self.actionAbout)
         self.iface.mainWindow().menuBar().addMenu(self.menu)
 
         self.actionGroup = QActionGroup(self)
@@ -121,6 +114,3 @@ class REC2Plugin(QObject):
             pass
         self.upstreamDownstreamDialog = UpstreamDownstreamDialog(self.iface, self.recLayer, self.iface.mainWindow())
         self.upstreamDownstreamDialog.show()
-
-    def __showAboutDialog(self):
-        AboutDialog(self.pluginDir, self.iface.mainWindow()).exec_()
