@@ -44,12 +44,13 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
         self.pushButtonSetup = self.buttonBox.addButton(self.tr("Setup"), QDialogButtonBox.ActionRole)
         self.iface = iface
         self.recLayer = None
-        setupDialog = SetupDialog(self.iface.mainWindow())
 
-        reg = QgsMapLayerRegistry.instance()
+        recLayerUrls = SetupDialog(self).getAllRecLayerUrls()
         for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
-                self.recLayer = reg.mapLayer(layer.id())
+            for url in recLayerUrls:
+                if url in layer.source():
+                    self.recLayer = QgsMapLayerRegistry.instance().mapLayer(layer.id())
+                    break
 
         self.selectTool = PointSelectTool(self.iface)
         self.selectTool.pointSelected.connect(

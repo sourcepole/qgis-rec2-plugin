@@ -28,6 +28,10 @@ class SetupDialog(QDialog, Ui_SetupDialog):
 
         self.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.__restoreDefaults)
 
+    def getAllRecLayerUrls(self):
+        combo = self.comboBoxRecWMS
+        return [combo.itemText(i) for i in range(0, combo.count())]
+
     def getRecLayerURL(self):
         return self.comboBoxRecWMS.currentText()
 
