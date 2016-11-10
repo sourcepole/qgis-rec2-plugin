@@ -33,7 +33,7 @@ class REC2Plugin(QObject):
         self.actionUpstreamDownstream.triggered.connect(self.__showUpstreamDownstreamDialog)
 
         self.toolbar.addAction(self.actionUpstreamDownstream)
-        self.iface.addPluginToWebMenu("Rec2",  self.actionUpstreamDownstream)
+        self.iface.addPluginToWebMenu("Rec2", self.actionUpstreamDownstream)
         setupDialog = SetupDialog(self.iface.mainWindow())
 
     def unload(self):
@@ -49,8 +49,6 @@ class REC2Plugin(QObject):
             self.toolbar.deleteLater()
         except:
             pass
-
-
 
     def __showUpstreamDownstreamDialog(self):
         try:

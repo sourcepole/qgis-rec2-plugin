@@ -115,7 +115,6 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
             self.toolButtonSelectPosition.setEnabled(True)
 
     def __addLayer(self, url, title):
-
         if self.recLayer is None:
             return
 
