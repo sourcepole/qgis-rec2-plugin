@@ -71,10 +71,8 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
             lambda: self.__addLayer(UPSTREAM_URL, "Upstream"))
 
         self.pushButtonSetup.clicked.connect(self.__showSetupDialog)
-        self.toolButtonSelectPosition.setEnabled(False)
-        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
-                self.toolButtonSelectPosition.setEnabled(True)
+        self.toolButtonSelectPosition.setEnabled(self.recLayer is not None)
+
         QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.__checkLayerRemoved)
 
     def __checkLayerRemoved(self, layerid):
