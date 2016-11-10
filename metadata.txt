@@ -2,10 +2,10 @@
 name=REC2
 qgisMinimumVersion=2.8
 qgisMaximumVersion=2.99
-description=NIWA REC2 plugin
+description=Developed for NIWA, New Zealand.
 about=The REC2 plugin allows the user to perform upstream and downstream queries of NIWA REC River Network layers.
-version=1.0
-author=Sandro Mani (Sourcepole AG)
+version=1.1
+author=Sandro Mani, William Habelt (Sourcepole AG)
 email=smani@sourcepole.ch
 
 # end of mandatory metadata
@@ -14,6 +14,11 @@ email=smani@sourcepole.ch
 
 # Uncomment the following line and add your changelog entries:
 changelog=
+ * v1.1 (xxx)
+ - Detect existing rec layer from project
+ - Replace menu with toolbar button / web menu
+ - Move setup button to upstream/downstream dialog
+
  * v1.0 (15 September 2015)
  - Release 1.0
 

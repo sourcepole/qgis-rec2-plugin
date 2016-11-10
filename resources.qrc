@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/rec2" >
+        <file>icons/icon.png</file>
+    </qresource>
+</RCC>

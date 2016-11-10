@@ -16,6 +16,7 @@ from qgis.core import *
 from qgis.gui import *
 import re
 from ui_UpstreamDownstreamDialog import Ui_UpstreamDownstreamDialog
+from SetupDialog import SetupDialog
 
 
 DOWNSTREAM_URL = "http://gs.niwa.co.nz/niwa/wms?viewparams=hydroid:%s&layers=rec2_trace_downstream&styles=&IgnoreGetMapUrl=1"
@@ -37,11 +38,19 @@ class PointSelectTool(QgsMapTool):
 
 
 class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
-    def __init__(self, iface, recLayer, parent=None):
+    def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
+        self.pushButtonSetup = self.buttonBox.addButton(self.tr("Setup"), QDialogButtonBox.ActionRole)
         self.iface = iface
-        self.recLayer = recLayer
+        self.recLayer = None
+        setupDialog = SetupDialog(self.iface.mainWindow())
+
+        reg = QgsMapLayerRegistry.instance()
+        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
+                self.recLayer = reg.mapLayer(layer.id())
+
         self.selectTool = PointSelectTool(self.iface)
         self.selectTool.pointSelected.connect(
             lambda p: self.lineEditPosition.setText("%f %f" % (p.x(), p.y())))
@@ -61,7 +70,56 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
         self.pushButtonSearchUpstream.clicked.connect(
             lambda: self.__addLayer(UPSTREAM_URL, "Upstream"))
 
+        self.pushButtonSetup.clicked.connect(self.__showSetupDialog)
+        self.toolButtonSelectPosition.setEnabled(False)
+        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+            if(layer.source() == "url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL()):
+                self.toolButtonSelectPosition.setEnabled(True)
+        QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.__checkLayerRemoved)
+
+    def __checkLayerRemoved(self, layerid):
+        layer = QgsMapLayerRegistry.instance().mapLayer(layerid)
+        if layer == self.recLayer:
+            self.recLayer = None
+            self.toolButtonSelectPosition.setEnabled(False)
+            self.lineEditPosition.setText("")
+
+    def __showSetupDialog(self):
+            setupDialog = SetupDialog(self.iface.mainWindow())
+            if setupDialog.exec_() != QDialog.Accepted:
+                return
+
+            if self.recLayer is not None:
+                result = QMessageBox.question(self, 'Replace Layer?', "There seems to already be a REC layer in the project. Are you sure you wish to overwrite it?", QMessageBox.No | QMessageBox.Yes)
+                if result == QMessageBox.No:
+                    return
+                QgsMapLayerRegistry.instance().removeMapLayer(self.recLayer.id())
+
+            # Sets Coordinate System
+            layers = self.iface.legendInterface().layers()
+            if(layers):
+                self.iface.mapCanvas().setCrsTransformEnabled(True)
+                self.iface.mapCanvas().setDestinationCrs(QgsCoordinateReferenceSystem(2193, QgsCoordinateReferenceSystem.EpsgCrsId))
+
+            self.iface.mainWindow().setCursor(Qt.BusyCursor)
+
+            self.recLayer = QgsRasterLayer("url=%s&crs=EPSG:2193&format=image/png" % setupDialog.getRecLayerURL(), setupDialog.getRecLayerTitle(), "wms")
+
+            if self.recLayer is None:
+                self.iface.mainWindow().unsetCursor()
+                QMessageBox.warning(self.iface.mainWindow(), "Invalid layer", "The REC network layer is invalid. Cannot continue.")
+                return
+
+            QgsMapLayerRegistry.instance().addMapLayers([self.recLayer])
+
+            self.iface.mainWindow().unsetCursor()
+            self.toolButtonSelectPosition.setEnabled(True)
+
     def __addLayer(self, url, title):
+
+        if self.recLayer is None:
+            return
+
         r = self.lineEditPosition.validator().regExp()
         p = QgsPoint(float(r.cap(1)), float(r.cap(2)))
         p = self.iface.mapCanvas().mapSettings().mapToLayerCoordinates(self.recLayer, p)
