@@ -84,7 +84,7 @@ class UpstreamDownstreamDialog(QDialog, Ui_UpstreamDownstreamDialog):
             self.lineEditPosition.setText("")
 
     def __showSetupDialog(self):
-            setupDialog = SetupDialog(self.iface.mainWindow())
+            setupDialog = SetupDialog(self)
             if setupDialog.exec_() != QDialog.Accepted:
                 return
 
